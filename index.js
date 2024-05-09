@@ -10,7 +10,8 @@ dotenv.config();
 const corsOptions = [
     'http://localhost:5173',
     'http://localhost:5174',
-]
+];
+
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -19,17 +20,28 @@ app.use(cors({ origin: corsOptions, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 
+const cookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+};
+
+const logger = async (req, res, next) => {
+    console.log('called: ', req.hostname, req.originalUrl);
+    next();
+}
+
 // verify token
 const verifyToken = async (req, res, next) => {
     const token = req.cookies?.token;
     console.log('value of the token in the middleware: ', token);
     if (!token) {
-        return res.status(401).send({ message: 'Not Authorized!' })
+        return res.status(401).send({ message: 'Not Authorized!' });
     }
     jwt.verify(token, process.env.TOKEN_SECRET, (err, decoded) => {
         if (err) {
             console.log(err);
-            return res.status(401).send({ message: 'Unauthorized Access!' })
+            return res.status(401).send({ message: 'Unauthorized Access!' });
         }
         // console.log('value in the token', decoded);
         req.user = decoded;
@@ -54,6 +66,23 @@ const run = async () => {
     try {
         // Connect the client to the server	(optional starting in v4.7)
         // await client.connect();
+
+        // generating token
+        app.post('/jwt', logger, async (req, res) => {
+            const user = req.body;
+            console.log('token for user: ', user);
+            const token = jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: '72h' });
+
+            res.cookie('token', token, cookieOptions).send({ success: true })
+        })
+
+        //clearing token
+        app.post("/logout", async (req, res) => {
+            const user = req.body;
+            console.log("logging out...", user);
+
+            res.clearCookie("token", { ...cookieOptions, maxAge: 0 }).send({ success: true });
+        });
 
 
 
