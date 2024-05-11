@@ -68,6 +68,7 @@ const run = async () => {
         // await client.connect();
 
         const blogCollection = client.db('furryFriendsDB').collection('blogs');
+        const commentCollection = client.db('furryFriendsDB').collection('comments');
 
         // generating token
         app.post('/jwt', logger, async (req, res) => {
@@ -110,10 +111,26 @@ const run = async () => {
 
         app.get('/blogs/:id', async (req, res) => {
             const blog_id = req.params.id;
-            const filter = {_id: new ObjectId(blog_id) }
+            const filter = { _id: new ObjectId(blog_id) }
             const result = await blogCollection.findOne(filter);
 
             res.send(result)
+        })
+
+        app.post('/comments', async (req, res) => {
+            console.log((req.body));
+            const result = await commentCollection.insertOne(req.body);
+
+            res.send(result);
+        })
+
+        app.get('/comments/:id', async (req, res) => {
+            const post_id = req.params.id;
+            const filter = { blog_id: post_id };
+            console.log(filter);
+            const result = await commentCollection.find(filter).toArray();
+
+            res.send(result);
         })
 
 
