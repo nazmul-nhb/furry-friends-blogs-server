@@ -67,6 +67,8 @@ const run = async () => {
         // Connect the client to the server	(optional starting in v4.7)
         // await client.connect();
 
+        const blogsCollection = client.db('furryFriendsDB').collection('blogs');
+
         // generating token
         app.post('/jwt', logger, async (req, res) => {
             const user = req.body;
@@ -84,7 +86,19 @@ const run = async () => {
             res.clearCookie("token", { ...cookieOptions, maxAge: 0 }).send({ success: true });
         });
 
+        app.get('/blogs', async (req, res) => {
+            const page = parseInt(req.query.page);
+            const size = parseInt(req.query.size);
+            const sortBy = parseInt(req.query.sort);
+            console.log(sortBy);
+            const result = await blogsCollection.find()
+                .sort({ posted_on: sortBy })
+                .skip(page * size)
+                .limit(size)
+                .toArray();
 
+            res.send(result);
+        })
 
 
 
