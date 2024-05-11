@@ -86,11 +86,18 @@ const run = async () => {
             res.clearCookie("token", { ...cookieOptions, maxAge: 0 }).send({ success: true });
         });
 
+        app.post('/blogs', async (req, res) => {
+            console.log((req.body));
+            const result = await blogCollection.insertOne(req.body);
+
+            res.send(result);
+        })
+
         app.get('/blogs', async (req, res) => {
             const page = parseInt(req.query.page);
             const size = parseInt(req.query.size);
-            const sortBy = parseInt(req.query.sort);
-            console.log(sortBy);
+            const sortBy = parseInt(req.query.sort) || 1;
+            // console.log(sortBy);
             const result =
                 await blogCollection.find()
                     .sort({ posted_on: sortBy })
