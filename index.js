@@ -69,6 +69,7 @@ const run = async () => {
 
         const blogCollection = client.db('furryFriendsDB').collection('blogs');
         const commentCollection = client.db('furryFriendsDB').collection('comments');
+        const replyCollection = client.db('furryFriendsDB').collection('replies');
 
         // generating token
         app.post('/jwt', logger, async (req, res) => {
@@ -125,14 +126,35 @@ const run = async () => {
         })
 
         app.get('/comments/:id', async (req, res) => {
-            const post_id = req.params.id;
-            const filter = { blog_id: post_id };
+            const filter = { blog_id: req.params.id };
             console.log(filter);
             const result = await commentCollection.find(filter).toArray();
 
             res.send(result);
         })
 
+        // app.put('/comments/:id', async (req, res) => {
+        //     const filter = { _id: new ObjectId(req.params.id) };
+        //     const updatedComment = req.body;
+        //     const options = { upsert: true };
+        //     const comment = { $set: { ...updatedComment } };
+        //     const result = await commentCollection.updateOne(filter, comment, options)
+        // })
+
+        app.post('/replies', async (req, res) => {
+            console.log((req.body));
+            const result = await replyCollection.insertOne(req.body);
+
+            res.send(result);
+        })
+
+        app.get('/replies/:id', async (req, res) => {
+            const filter = { comment_id: req.params.id };
+            console.log(filter);
+            const result = await replyCollection.find(filter).toArray();
+
+            res.send(result);
+        })
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
