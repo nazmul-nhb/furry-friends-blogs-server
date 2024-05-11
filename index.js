@@ -67,7 +67,7 @@ const run = async () => {
         // Connect the client to the server	(optional starting in v4.7)
         // await client.connect();
 
-        const blogsCollection = client.db('furryFriendsDB').collection('blogs');
+        const blogCollection = client.db('furryFriendsDB').collection('blogs');
 
         // generating token
         app.post('/jwt', logger, async (req, res) => {
@@ -91,15 +91,23 @@ const run = async () => {
             const size = parseInt(req.query.size);
             const sortBy = parseInt(req.query.sort);
             console.log(sortBy);
-            const result = await blogsCollection.find()
-                .sort({ posted_on: sortBy })
-                .skip(page * size)
-                .limit(size)
-                .toArray();
+            const result =
+                await blogCollection.find()
+                    .sort({ posted_on: sortBy })
+                    .skip(page * size)
+                    .limit(size)
+                    .toArray();
 
             res.send(result);
         })
 
+        app.get('/blogs/:id', async (req, res) => {
+            const blog_id = req.params.id;
+            const filter = {_id: new ObjectId(blog_id) }
+            const result = await blogCollection.findOne(filter);
+
+            res.send(result)
+        })
 
 
         // Send a ping to confirm a successful connection

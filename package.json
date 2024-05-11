@@ -18,5 +18,8 @@
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.6.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.11"
   }
 }
