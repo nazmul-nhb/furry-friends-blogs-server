@@ -81,7 +81,7 @@ const run = async () => {
             res.cookie('token', token, cookieOptions).send({ success: true })
         })
 
-        //clearing token
+        // clearing token
         app.post("/logout", async (req, res) => {
             const user = req.body;
             console.log("logging out...", user);
@@ -101,32 +101,36 @@ const run = async () => {
         app.get('/blogs-count', async (req, res) => {
             const category = req.query.category ? req.query.category.trim() : '';
             // console.log(category);
-            const filter = category? { category: category } : {};
+            const filter = category ? { category: category } : {};
             const count = await blogCollection.countDocuments(filter);
 
             res.send({ count })
         })
 
-        // get blogs in array
-        app.get('/blogs', async (req, res) => {
+        // get blogs in array with sort, pagination, fixed number of blogs and search functionalies
+        app.get("/blogs", async (req, res) => {
             const page = parseInt(req.query.page);
             const size = parseInt(req.query.size);
             const sortBy = parseInt(req.query.sort) || 1;
 
-            let filter = {}
-            if (req.query.category !== '' && (req.query.category && req.query.category.trim() !== '')) {
+            let filter = {};
+            if (req.query.category !== "" && req.query.category && req.query.category.trim() !== "") {
                 filter.category = req.query.category;
             }
+            if (req.query.search) {
+                filter.blog_title = { $regex: req.query.search, $options: "i" };
+            }
+            // console.log(filter);
 
-            const result =
-                await blogCollection.find(filter)
-                    .sort({ posted_on: sortBy })
-                    .skip(page * size)
-                    .limit(size)
-                    .toArray();
+            const result = await blogCollection
+                .find(filter)
+                .sort({ posted_on: sortBy })
+                .skip(page * size)
+                .limit(size)
+                .toArray();
 
             res.send(result);
-        })
+        });
 
         // get single blog
         app.get('/blogs/:id', async (req, res) => {
@@ -135,6 +139,18 @@ const run = async () => {
             const result = await blogCollection.findOne(filter);
 
             res.send(result)
+        })
+
+        // top 10 featured blogs
+        app.get('/featured-blogs', async (req, res) => {
+            const blog = {
+                blog_title: 1, posted_on: 1, posted_by: 1, blogger_photo: 1, blogger_email: 1,
+                total_characters: { $strLenCP: "$long_description" }
+            }
+            const result = await blogCollection
+                .aggregate([{ $project: blog }, { $sort: { total_characters: -1 } }, { $limit: 10 }]).toArray();
+
+            res.send(result);
         })
 
         // add comments
@@ -220,7 +236,7 @@ const run = async () => {
             // console.log(wishlistIDs);
 
             const query = { _id: { $in: wishlistIDs } }
-            const result = await blogCollection.find(query).toArray();
+            const result = await blogCollection.find(query).sort({ blog_title: 1 }).toArray();
 
             res.send(result);
         })
