@@ -70,6 +70,7 @@ const run = async () => {
         const blogCollection = client.db('furryFriendsDB').collection('blogs');
         const commentCollection = client.db('furryFriendsDB').collection('comments');
         const replyCollection = client.db('furryFriendsDB').collection('replies');
+        const wishlistCollection = client.db('furryFriendsDB').collection('wishlist');
 
         // generating token
         app.post('/jwt', logger, async (req, res) => {
@@ -152,6 +153,20 @@ const run = async () => {
             const filter = { comment_id: req.params.id };
             console.log(filter);
             const result = await replyCollection.find(filter).sort({ replied_on: -1 }).toArray();
+
+            res.send(result);
+        })
+
+        app.post('/wishlist', async (req, res) => {
+            const result = await wishlistCollection.insertOne(req.body);
+
+            res.send(result);
+        })
+
+        app.get('/wishlist', async (req, res) => {
+            const filter = { user_email: req.query.email };
+            console.log(filter);
+            const result = await wishlistCollection.find(filter).toArray();
 
             res.send(result);
         })
