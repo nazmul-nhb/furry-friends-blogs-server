@@ -158,6 +158,15 @@ const run = async () => {
         })
 
         app.post('/wishlist', async (req, res) => {
+            const { blog_id, user_email } = req.body;
+
+            // Check if the blog is already in the wishlist for the user
+            const existingEntry = await wishlistCollection.findOne({ blog_id, user_email });
+
+            if (existingEntry) {
+                return res.status(409).send({ message: 'Blog is Already in Your Wishlist' });
+            }
+
             const result = await wishlistCollection.insertOne(req.body);
 
             res.send(result);
@@ -166,7 +175,19 @@ const run = async () => {
         app.get('/wishlist', async (req, res) => {
             const filter = { user_email: req.query.email };
             console.log(filter);
-            const result = await wishlistCollection.find(filter).toArray();
+            const result = await wishlistCollection.find(filter).sort({ time_added: -1 }).toArray();
+
+            res.send(result);
+        })
+
+        app.post('/wishlist-blogs', async (req, res) => {
+            const ids = req.body;
+            const wishlistIDs = ids.map(id => new ObjectId(id))
+
+            console.log(wishlistIDs);
+
+            const query = { _id: { $in: wishlistIDs } }
+            const result = await blogCollection.find(query).toArray();
 
             res.send(result);
         })
