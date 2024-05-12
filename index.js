@@ -91,7 +91,7 @@ const run = async () => {
 
         // add blog
         app.post('/blogs', async (req, res) => {
-            console.log((req.body));
+            // console.log((req.body));
             const result = await blogCollection.insertOne(req.body);
 
             res.send(result);
@@ -99,8 +99,11 @@ const run = async () => {
 
         // blogs count
         app.get('/blogs-count', async (req, res) => {
-            const count = await blogCollection.estimatedDocumentCount();
-            
+            const category = req.query.category ? req.query.category.trim() : '';
+            // console.log(category);
+            const filter = category? { category: category } : {};
+            const count = await blogCollection.countDocuments(filter);
+
             res.send({ count })
         })
 
@@ -109,9 +112,14 @@ const run = async () => {
             const page = parseInt(req.query.page);
             const size = parseInt(req.query.size);
             const sortBy = parseInt(req.query.sort) || 1;
-            // console.log(sortBy);
+
+            let filter = {}
+            if (req.query.category !== '' && (req.query.category && req.query.category.trim() !== '')) {
+                filter.category = req.query.category;
+            }
+
             const result =
-                await blogCollection.find()
+                await blogCollection.find(filter)
                     .sort({ posted_on: sortBy })
                     .skip(page * size)
                     .limit(size)
@@ -131,7 +139,7 @@ const run = async () => {
 
         // add comments
         app.post('/comments', async (req, res) => {
-            console.log((req.body));
+            // console.log((req.body));
             const result = await commentCollection.insertOne(req.body);
 
             res.send(result);
@@ -140,7 +148,7 @@ const run = async () => {
         // get comments filtered by blog id and user email
         app.get('/comments/:id', async (req, res) => {
             const filter = { blog_id: req.params.id };
-            console.log(filter);
+            // console.log(filter);
             const result = await commentCollection.find(filter).sort({ commented_on: -1 }).toArray();
 
             res.send(result);
@@ -156,7 +164,7 @@ const run = async () => {
 
         // add reply
         app.post('/replies', async (req, res) => {
-            console.log((req.body));
+            // console.log((req.body));
             const result = await replyCollection.insertOne(req.body);
 
             res.send(result);
@@ -165,7 +173,7 @@ const run = async () => {
         // get replies filtered by comment id and user email
         app.get('/replies/:id', async (req, res) => {
             const filter = { comment_id: req.params.id };
-            console.log(filter);
+            // console.log(filter);
             const result = await replyCollection.find(filter).sort({ replied_on: -1 }).toArray();
 
             res.send(result);
@@ -189,7 +197,7 @@ const run = async () => {
         // get wishlist blog ids in array filtered by user email
         app.get('/wishlist', async (req, res) => {
             const filter = { user_email: req.query.email };
-            console.log(filter);
+            // console.log(filter);
             const result = await wishlistCollection.find(filter).sort({ time_added: -1 }).toArray();
 
             res.send(result);
@@ -209,7 +217,7 @@ const run = async () => {
             const ids = req.body;
             const wishlistIDs = ids.map(id => new ObjectId(id))
 
-            console.log(wishlistIDs);
+            // console.log(wishlistIDs);
 
             const query = { _id: { $in: wishlistIDs } }
             const result = await blogCollection.find(query).toArray();
