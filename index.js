@@ -89,6 +89,7 @@ const run = async () => {
             res.clearCookie("token", { ...cookieOptions, maxAge: 0 }).send({ success: true });
         });
 
+        // add blog
         app.post('/blogs', async (req, res) => {
             console.log((req.body));
             const result = await blogCollection.insertOne(req.body);
@@ -96,6 +97,14 @@ const run = async () => {
             res.send(result);
         })
 
+        // blogs count
+        app.get('/blogs-count', async (req, res) => {
+            const count = await blogCollection.estimatedDocumentCount();
+            
+            res.send({ count })
+        })
+
+        // get blogs in array
         app.get('/blogs', async (req, res) => {
             const page = parseInt(req.query.page);
             const size = parseInt(req.query.size);
@@ -111,6 +120,7 @@ const run = async () => {
             res.send(result);
         })
 
+        // get single blog
         app.get('/blogs/:id', async (req, res) => {
             const blog_id = req.params.id;
             const filter = { _id: new ObjectId(blog_id) }
@@ -119,6 +129,7 @@ const run = async () => {
             res.send(result)
         })
 
+        // add comments
         app.post('/comments', async (req, res) => {
             console.log((req.body));
             const result = await commentCollection.insertOne(req.body);
@@ -126,6 +137,7 @@ const run = async () => {
             res.send(result);
         })
 
+        // get comments filtered by blog id and user email
         app.get('/comments/:id', async (req, res) => {
             const filter = { blog_id: req.params.id };
             console.log(filter);
@@ -142,6 +154,7 @@ const run = async () => {
         //     const result = await commentCollection.updateOne(filter, comment, options)
         // })
 
+        // add reply
         app.post('/replies', async (req, res) => {
             console.log((req.body));
             const result = await replyCollection.insertOne(req.body);
@@ -149,6 +162,7 @@ const run = async () => {
             res.send(result);
         })
 
+        // get replies filtered by comment id and user email
         app.get('/replies/:id', async (req, res) => {
             const filter = { comment_id: req.params.id };
             console.log(filter);
@@ -157,12 +171,12 @@ const run = async () => {
             res.send(result);
         })
 
+        // add blog id to wishlist with user email and blog id
         app.post('/wishlist', async (req, res) => {
             const { blog_id, user_email } = req.body;
 
             // Check if the blog is already in the wishlist for the user
             const existingEntry = await wishlistCollection.findOne({ blog_id, user_email });
-
             if (existingEntry) {
                 return res.status(409).send({ message: 'Blog is Already in Your Wishlist' });
             }
@@ -172,6 +186,7 @@ const run = async () => {
             res.send(result);
         })
 
+        // get wishlist blog ids in array filtered by user email
         app.get('/wishlist', async (req, res) => {
             const filter = { user_email: req.query.email };
             console.log(filter);
@@ -180,6 +195,7 @@ const run = async () => {
             res.send(result);
         })
 
+        // delete blog id from wishlist filtered by user email
         app.delete('/wishlist/:id', async (req, res) => {
             const query = { user_email: req.query.email, blog_id: req.params.id };
             // const query = { _id: new ObjectId(delete_id) };
@@ -188,6 +204,7 @@ const run = async () => {
             res.send(result)
         })
 
+        // get full blog for each id from wishlist with a post request filtered by blog id
         app.post('/wishlist-blogs', async (req, res) => {
             const ids = req.body;
             const wishlistIDs = ids.map(id => new ObjectId(id))
