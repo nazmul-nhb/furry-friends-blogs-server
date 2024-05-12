@@ -128,7 +128,7 @@ const run = async () => {
         app.get('/comments/:id', async (req, res) => {
             const filter = { blog_id: req.params.id };
             console.log(filter);
-            const result = await commentCollection.find(filter).toArray();
+            const result = await commentCollection.find(filter).sort({ commented_on: -1 }).toArray();
 
             res.send(result);
         })
@@ -151,7 +151,7 @@ const run = async () => {
         app.get('/replies/:id', async (req, res) => {
             const filter = { comment_id: req.params.id };
             console.log(filter);
-            const result = await replyCollection.find(filter).toArray();
+            const result = await replyCollection.find(filter).sort({ replied_on: -1 }).toArray();
 
             res.send(result);
         })
