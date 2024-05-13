@@ -158,10 +158,14 @@ const run = async () => {
         app.get('/featured-blogs', async (req, res) => {
             const blog = {
                 blog_title: 1, posted_on: 1, posted_by: 1, blogger_photo: 1, blogger_email: 1,
-                total_characters: { $strLenCP: "$long_description" }
+                // confused: which one to use total character or word count !!!
+                total_characters: { $strLenCP: "$long_description" }, 
+                word_count: { $size: { $split: ["$long_description", " "] } }
             }
-            const result = await blogCollection
-                .aggregate([{ $project: blog }, { $sort: { total_characters: -1 } }, { $limit: 10 }]).toArray();
+            const newBlogs = await blogCollection
+                .aggregate([{ $project: blog }, { $sort: { word_count: -1 } }, { $limit: 10 }]).toArray();
+
+            const result = newBlogs.map((newBlog, index) => ({ ...newBlog, serial: index + 1 }));
 
             res.send(result);
         })
