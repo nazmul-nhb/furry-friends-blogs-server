@@ -154,11 +154,23 @@ const run = async () => {
             res.send(result)
         })
 
+        // update single blog
+        app.patch('/blogs/:id', async (req, res) => {
+            const filter = { _id: new ObjectId(req.params.id) };
+            const updatedBlog = req.body;
+            console.log(updatedBlog);
+            const options = { upsert: true };
+            const blog = { $set: { ...updatedBlog } };
+            const result = await blogCollection.updateOne(filter, blog, options)
+
+            res.send(result)
+        })
+
         // top 10 featured blogs
         app.get('/featured-blogs', async (req, res) => {
             const blog = {
                 blog_title: 1, posted_on: 1, posted_by: 1, blogger_photo: 1, blogger_email: 1,
-                // confused: which one to use total character or word count !!!
+                // confused: which one to use : total characters or word count !!!
                 total_characters: { $strLenCP: "$long_description" }, 
                 word_count: { $size: { $split: ["$long_description", " "] } }
             }
@@ -248,11 +260,11 @@ const run = async () => {
         // get full blog for each id from wishlist with a post request filtered by blog id
         app.post('/wishlist-blogs', async (req, res) => {
             const ids = req.body;
-            const wishlistIDs = ids.map(id => new ObjectId(id))
+            const wishlistIDs = ids.map(id => new ObjectId(id));
 
             // console.log(wishlistIDs);
 
-            const query = { _id: { $in: wishlistIDs } }
+            const query = { _id: { $in: wishlistIDs } };
             const result = await blogCollection.find(query).sort({ blog_title: 1 }).toArray();
 
             res.send(result);
