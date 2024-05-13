@@ -97,17 +97,26 @@ const run = async () => {
             res.send(result);
         })
 
-        // blogs count
+        // blogs count with optional category & search filter
         app.get('/blogs-count', async (req, res) => {
             const category = req.query.category ? req.query.category.trim() : '';
-            // console.log(category);
-            const filter = category ? { category: category } : {};
+            const searchText = req.query.search ? req.query.search.trim() : '';
+            let filter = {};
+
+            if (category) {
+                filter.category = category;
+            }
+
+            if (searchText) {
+                filter.blog_title = { $regex: searchText, $options: "i" };
+            }
+
             const count = await blogCollection.countDocuments(filter);
 
             res.send({ count })
         })
 
-        // get blogs in array with sort, pagination, fixed number of blogs and search functionalies
+        // get blogs in array with sort, pagination, fixed number of blogs and search functionalities
         app.get("/blogs", async (req, res) => {
             const page = parseInt(req.query.page);
             const size = parseInt(req.query.size);
@@ -128,6 +137,10 @@ const run = async () => {
                 .skip(page * size)
                 .limit(size)
                 .toArray();
+
+            // if (result.length === 0) {
+            //     return res.status(404).send({message: "No Blogs Found!"});
+            // }
 
             res.send(result);
         });
