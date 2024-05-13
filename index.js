@@ -38,9 +38,9 @@ const verifyToken = async (req, res, next) => {
     if (!token) {
         return res.status(401).send({ message: 'Not Authorized!' });
     }
-    jwt.verify(token, process.env.TOKEN_SECRET, (err, decoded) => {
-        if (err) {
-            console.log(err);
+    jwt.verify(token, process.env.TOKEN_SECRET, (error, decoded) => {
+        if (error) {
+            console.log(error);
             return res.status(401).send({ message: 'Unauthorized Access!' });
         }
         // console.log('value in the token', decoded);
@@ -86,7 +86,7 @@ const run = async () => {
             const user = req.body;
             console.log("logging out...", user);
 
-            res.clearCookie("token", { ...cookieOptions, maxAge: 0 }).send({ success: true });
+            res.clearCookie('token', { ...cookieOptions, maxAge: 0 }).send({ success: true });
         });
 
         // add blog
@@ -158,7 +158,7 @@ const run = async () => {
         app.patch('/blogs/:id', async (req, res) => {
             const filter = { _id: new ObjectId(req.params.id) };
             const updatedBlog = req.body;
-            console.log(updatedBlog);
+            // console.log(updatedBlog);
             const options = { upsert: true };
             const blog = { $set: { ...updatedBlog } };
             const result = await blogCollection.updateOne(filter, blog, options)
@@ -240,10 +240,15 @@ const run = async () => {
         })
 
         // get wishlist blog ids in array filtered by user email
-        app.get('/wishlist', async (req, res) => {
+        app.get('/wishlist', logger, verifyToken, async (req, res) => {
+            // match user
+            if (req.query?.email !== req.user.email) {
+                return res.status(403).send({ message: 'Forbidden Access!' })
+            }
+
             const filter = { user_email: req.query.email };
             // console.log(filter);
-            const result = await wishlistCollection.find(filter).sort({ time_added: -1 }).toArray();
+            const result = await wishlistCollection.find(filter).toArray();
 
             res.send(result);
         })
