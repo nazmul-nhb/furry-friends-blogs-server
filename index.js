@@ -10,6 +10,10 @@ dotenv.config();
 const corsOptions = [
     'http://localhost:5173',
     'http://localhost:5174',
+    'https://furry-friends-dcbd4.web.app',
+    'https://furry-friends-dcbd4.firebaseapp.com',
+    'https://furry-friends-blogs-nhb.vercel.app',
+    'https://furry-friends-blogs-nhb-nazmul-hassans-projects.vercel.app'
 ];
 
 const app = express();
@@ -276,8 +280,8 @@ const run = async () => {
         })
 
         // Send a ping to confirm a successful connection
-        await client.db("admin").command({ ping: 1 });
-        console.log("Pinged your deployment. You successfully connected to MongoDB!");
+        // await client.db("admin").command({ ping: 1 });
+        // console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
         // Ensures that the client will close when you finish/error
         // await client.close();
