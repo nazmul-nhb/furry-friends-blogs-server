@@ -133,6 +133,7 @@ const run = async () => {
             if (req.query.search) {
                 filter.blog_title = { $regex: req.query.search, $options: "i" };
             }
+            
             // console.log(filter);
 
             const result = await blogCollection
@@ -141,10 +142,6 @@ const run = async () => {
                 .skip(page * size)
                 .limit(size)
                 .toArray();
-
-            // if (result.length === 0) {
-            //     return res.status(404).send({message: "No Blogs Found!"});
-            // }
 
             res.send(result);
         });
@@ -203,6 +200,7 @@ const run = async () => {
             res.send(result);
         })
 
+        // update comment : will do after getting assignment result
         // app.put('/comments/:id', async (req, res) => {
         //     const filter = { _id: new ObjectId(req.params.id) };
         //     const updatedComment = req.body;
