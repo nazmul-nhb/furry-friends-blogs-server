@@ -133,7 +133,7 @@ const run = async () => {
             if (req.query.search) {
                 filter.blog_title = { $regex: req.query.search, $options: "i" };
             }
-            
+
             // console.log(filter);
 
             const result = await blogCollection
@@ -170,9 +170,9 @@ const run = async () => {
         // top 10 featured blogs
         app.get('/featured-blogs', async (req, res) => {
             const blog = {
-                blog_title: 1, posted_on: 1, posted_by: 1, blogger_photo: 1, blogger_email: 1,
+                blog_title: 1, posted_on: 1, posted_by: 1, blogger_photo: 1, blogger_email: 1, image: 1,
                 // confused: which one to use : total characters or word count !!!
-                total_characters: { $strLenCP: "$long_description" }, 
+                total_characters: { $strLenCP: "$long_description" },
                 word_count: { $size: { $split: ["$long_description", " "] } }
             }
             const newBlogs = await blogCollection
