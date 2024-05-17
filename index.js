@@ -125,6 +125,7 @@ const run = async () => {
             const page = parseInt(req.query.page);
             const size = parseInt(req.query.size);
             const sortBy = parseInt(req.query.sort) || 1;
+            const currentUser = req.query.currentUser;
 
             let filter = {};
             if (req.query.category !== "" && req.query.category && req.query.category.trim() !== "") {
@@ -132,6 +133,9 @@ const run = async () => {
             }
             if (req.query.search) {
                 filter.blog_title = { $regex: req.query.search, $options: "i" };
+            }
+            if (currentUser && currentUser !== '') {
+                filter.blogger_email = currentUser;
             }
 
             // console.log(filter);
