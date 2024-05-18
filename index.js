@@ -232,7 +232,7 @@ const run = async () => {
         })
 
         // get replies filtered by comment id and user email
-        app.get('/replies/:id', verifyToken, verifyToken, async (req, res) => {
+        app.get('/replies/:id', verifyToken, async (req, res) => {
             const filter = { comment_id: req.params.id };
             // console.log(filter);
             const result = await replyCollection.find(filter).sort({ replied_on: -1 }).toArray();
@@ -270,7 +270,7 @@ const run = async () => {
         })
 
         // delete blog id from wishlist filtered by user email
-        app.delete('/wishlist/:id', async (req, res) => {
+        app.delete('/wishlist/:id', verifyToken, async (req, res) => {
             const query = { user_email: req.query.email, blog_id: req.params.id };
             const result = await wishlistCollection.deleteOne(query);
 
