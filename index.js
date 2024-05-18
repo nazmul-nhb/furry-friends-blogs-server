@@ -94,7 +94,7 @@ const run = async () => {
         });
 
         // add blog
-        app.post('/blogs', verifyToken, async (req, res) => {
+        app.post('/blogs', async (req, res) => {
             // console.log((req.body));
             const result = await blogCollection.insertOne(req.body);
 
@@ -161,7 +161,7 @@ const run = async () => {
         })
 
         // update single blog
-        app.patch('/blog/:id', verifyToken, async (req, res) => {
+        app.patch('/blog/:id', async (req, res) => {
             const filter = { _id: new ObjectId(req.params.id) };
             const updatedBlog = req.body;
             // console.log(updatedBlog);
@@ -189,7 +189,7 @@ const run = async () => {
         })
 
         // add comments
-        app.post('/comments', verifyToken, async (req, res) => {
+        app.post('/comments', async (req, res) => {
             // console.log((req.body));
             const result = await commentCollection.insertOne(req.body);
 
@@ -215,7 +215,7 @@ const run = async () => {
         // })
 
         // add reply
-        app.post('/replies', verifyToken, async (req, res) => {
+        app.post('/replies', async (req, res) => {
             // console.log((req.body));
             const result = await replyCollection.insertOne(req.body);
 
@@ -232,7 +232,7 @@ const run = async () => {
         })
 
         // add blog id to wishlist with user email and blog id
-        app.post('/wishlist', verifyToken, async (req, res) => {
+        app.post('/wishlist', async (req, res) => {
             const { blog_id, user_email } = req.body;
 
             // Check if the blog is already in the wishlist for the user
@@ -261,7 +261,7 @@ const run = async () => {
         })
 
         // delete blog id from wishlist filtered by user email
-        app.delete('/wishlist/:id', verifyToken, async (req, res) => {
+        app.delete('/wishlist/:id', async (req, res) => {
             const query = { user_email: req.query.email, blog_id: req.params.id };
             // const query = { _id: new ObjectId(delete_id) };
             const result = await wishlistCollection.deleteOne(query);
