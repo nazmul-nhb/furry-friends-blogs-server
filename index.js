@@ -77,7 +77,7 @@ const run = async () => {
         const wishlistCollection = client.db('furryFriendsDB').collection('wishlist');
 
         // generating token
-        app.post('/jwt', logger, async (req, res) => {
+        app.post('/jwt', async (req, res) => {
             const user = req.body;
             console.log('token for user: ', user);
             const token = jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: '72h' });
