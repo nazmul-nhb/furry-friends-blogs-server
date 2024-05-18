@@ -160,6 +160,15 @@ const run = async () => {
             res.send(result)
         })
 
+        // delete single blog
+        app.delete('/blog/:id', verifyToken, async (req, res) => {
+            const blog_id = req.params.id;
+            const query = { _id: new ObjectId(blog_id), blogger_email: req.query.email }
+            const result = await blogCollection.deleteOne(query);
+
+            res.send(result)
+        })
+
         // update single blog
         app.patch('/blog/:id', async (req, res) => {
             const filter = { _id: new ObjectId(req.params.id) };
@@ -263,7 +272,6 @@ const run = async () => {
         // delete blog id from wishlist filtered by user email
         app.delete('/wishlist/:id', async (req, res) => {
             const query = { user_email: req.query.email, blog_id: req.params.id };
-            // const query = { _id: new ObjectId(delete_id) };
             const result = await wishlistCollection.deleteOne(query);
 
             res.send(result)
