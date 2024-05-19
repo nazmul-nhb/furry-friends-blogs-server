@@ -214,8 +214,17 @@ const run = async () => {
             res.send(result);
         })
 
+        // delete single comment
+        app.delete('/comment/:id', verifyToken, async (req, res) => {
+            const comment_id = req.params.id;
+            const query = { _id: new ObjectId(comment_id) }
+            const result = await commentCollection.deleteOne(query);
+
+            res.send(result)
+        })
+
         // update comment : will do after getting assignment result
-        // app.put('/comments/:id', async (req, res) => {
+        // app.put('/comment/:id', async (req, res) => {
         //     const filter = { _id: new ObjectId(req.params.id) };
         //     const updatedComment = req.body;
         //     const options = { upsert: true };
@@ -238,6 +247,15 @@ const run = async () => {
             const result = await replyCollection.find(filter).sort({ replied_on: -1 }).toArray();
 
             res.send(result);
+        })
+
+        // delete single reply
+        app.delete('/reply/:id', verifyToken, async (req, res) => {
+            const reply_id = req.params.id;
+            const query = { _id: new ObjectId(reply_id) }
+            const result = await replyCollection.deleteOne(query);
+
+            res.send(result)
         })
 
         // add blog id to wishlist with user email and blog id
