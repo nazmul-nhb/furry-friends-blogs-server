@@ -259,7 +259,7 @@ const run = async () => {
         })
 
         // add blog id to wishlist with user email and blog id
-        app.post('/wishlist', async (req, res) => {
+        app.post('/wishlist', verifyToken, async (req, res) => {
             const { blog_id, user_email } = req.body;
 
             // Check if the blog is already in the wishlist for the user
