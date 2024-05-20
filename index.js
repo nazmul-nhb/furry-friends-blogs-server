@@ -265,7 +265,7 @@ const run = async () => {
             // Check if the blog is already in the wishlist for the user
             const existingEntry = await wishlistCollection.findOne({ blog_id, user_email });
             if (existingEntry) {
-                return res.status(409).send({ message: 'Blog is Already in Your Wishlist' });
+                return res.send({ message: 'Already Exists in Your Wishlist!' });
             }
 
             const result = await wishlistCollection.insertOne(req.body);
