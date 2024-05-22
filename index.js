@@ -82,7 +82,7 @@ const run = async () => {
             console.log('token for user: ', user);
             const token = jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: '72h' });
 
-            res.cookie('token', token, cookieOptions).send({ success: true })
+            res.cookie('token', token, cookieOptions).send({ success: true });
         })
 
         // clearing token
@@ -154,7 +154,7 @@ const run = async () => {
         // get single blog
         app.get('/blog/:id', verifyToken, async (req, res) => {
             const blog_id = req.params.id;
-            const filter = { _id: new ObjectId(blog_id) }
+            const filter = { _id: new ObjectId(blog_id) };
             const result = await blogCollection.findOne(filter);
 
             res.send(result)
@@ -163,7 +163,7 @@ const run = async () => {
         // delete single blog
         app.delete('/blog/:id', verifyToken, async (req, res) => {
             const blog_id = req.params.id;
-            const query = { _id: new ObjectId(blog_id), blogger_email: req.query.email }
+            const query = { _id: new ObjectId(blog_id), blogger_email: req.query.email };
             const result = await blogCollection.deleteOne(query);
 
             res.send(result)
@@ -189,6 +189,7 @@ const run = async () => {
                 total_characters: { $strLenCP: "$long_description" },
                 word_count: { $size: { $split: ["$long_description", " "] } }
             }
+            
             const newBlogs = await blogCollection
                 .aggregate([{ $project: blog }, { $sort: { word_count: -1 } }, { $limit: 10 }]).toArray();
 
@@ -217,13 +218,13 @@ const run = async () => {
         // delete single comment
         app.delete('/comment/:id', verifyToken, async (req, res) => {
             const comment_id = req.params.id;
-            const query = { _id: new ObjectId(comment_id) }
+            const query = { _id: new ObjectId(comment_id) };
             const result = await commentCollection.deleteOne(query);
 
             res.send(result)
         })
 
-        // update comment : will do after getting assignment result
+        // update comment
         app.patch('/comment/:id', verifyToken, async (req, res) => {
             const filter = { _id: new ObjectId(req.params.id) };
             const updatedComment = req.body;
@@ -254,8 +255,19 @@ const run = async () => {
         // delete single reply
         app.delete('/reply/:id', verifyToken, async (req, res) => {
             const reply_id = req.params.id;
-            const query = { _id: new ObjectId(reply_id) }
+            const query = { _id: new ObjectId(reply_id) };
             const result = await replyCollection.deleteOne(query);
+
+            res.send(result)
+        })
+
+        // update reply
+        app.patch('/reply/:id', verifyToken, async (req, res) => {
+            const filter = { _id: new ObjectId(req.params.id) };
+            const updatedReply = req.body;
+            const options = { upsert: true };
+            const reply = { $set: { ...updatedReply } };
+            const result = await replyCollection.updateOne(filter, reply, options);
 
             res.send(result)
         })
