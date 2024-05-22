@@ -176,9 +176,9 @@ const run = async () => {
             // console.log(updatedBlog);
             const options = { upsert: true };
             const blog = { $set: { ...updatedBlog } };
-            const result = await blogCollection.updateOne(filter, blog, options)
+            const result = await blogCollection.updateOne(filter, blog, options);
 
-            res.send(result)
+            res.send(result);
         })
 
         // top 10 featured blogs
@@ -224,13 +224,15 @@ const run = async () => {
         })
 
         // update comment : will do after getting assignment result
-        // app.put('/comment/:id', async (req, res) => {
-        //     const filter = { _id: new ObjectId(req.params.id) };
-        //     const updatedComment = req.body;
-        //     const options = { upsert: true };
-        //     const comment = { $set: { ...updatedComment } };
-        //     const result = await commentCollection.updateOne(filter, comment, options)
-        // })
+        app.patch('/comment/:id', verifyToken, async (req, res) => {
+            const filter = { _id: new ObjectId(req.params.id) };
+            const updatedComment = req.body;
+            const options = { upsert: true };
+            const comment = { $set: { ...updatedComment } };
+            const result = await commentCollection.updateOne(filter, comment, options);
+
+            res.send(result)
+        })
 
         // add reply
         app.post('/replies', async (req, res) => {
