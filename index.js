@@ -25,6 +25,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 const cookieOptions = {
+    maxAge: 72 * 60 * 60 * 1000,
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
@@ -152,7 +153,7 @@ const run = async () => {
         });
 
         // get single blog
-        app.get('/blog/:id', verifyToken, async (req, res) => {
+        app.get('/blog/:id', async (req, res) => {
             const blog_id = req.params.id;
             const filter = { _id: new ObjectId(blog_id) };
             const result = await blogCollection.findOne(filter);
@@ -170,7 +171,7 @@ const run = async () => {
         })
 
         // update single blog
-        app.patch('/blog/:id', async (req, res) => {
+        app.patch('/blog/:id', verifyToken, async (req, res) => {
             const filter = { _id: new ObjectId(req.params.id) };
             const updatedBlog = req.body;
             // console.log(updatedBlog);
@@ -207,7 +208,7 @@ const run = async () => {
         })
 
         // get comments filtered by blog id and user email
-        app.get('/comments/:id', verifyToken, async (req, res) => {
+        app.get('/comments/:id', async (req, res) => {
             const filter = { blog_id: req.params.id };
             // console.log(filter);
             const result = await commentCollection.find(filter).sort({ commented_on: -1 }).toArray();
@@ -244,7 +245,7 @@ const run = async () => {
         })
 
         // get replies filtered by comment id and user email
-        app.get('/replies/:id', verifyToken, async (req, res) => {
+        app.get('/replies/:id', async (req, res) => {
             const filter = { comment_id: req.params.id };
             // console.log(filter);
             const result = await replyCollection.find(filter).sort({ replied_on: -1 }).toArray();
@@ -273,7 +274,7 @@ const run = async () => {
         })
 
         // add blog id to wishlist with user email and blog id
-        app.post('/wishlist', verifyToken, async (req, res) => {
+        app.post('/wishlist', async (req, res) => {
             const { blog_id, user_email } = req.body;
 
             // Check if the blog is already in the wishlist for the user
@@ -288,11 +289,11 @@ const run = async () => {
         })
 
         // get wishlist blog ids in array filtered by user email
-        app.get('/wishlist', verifyToken, async (req, res) => {
+        app.get('/wishlist', async (req, res) => {
             // match user
-            if (req.query?.email !== req.user.email) {
-                return res.status(403).send({ message: 'Forbidden Access!' })
-            }
+            // if (req.query?.email !== req.user.email) {
+            //     return res.status(403).send({ message: 'Forbidden Access!' })
+            // }
 
             const filter = { user_email: req.query.email };
             // console.log(filter);
