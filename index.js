@@ -318,7 +318,7 @@ const run = async () => {
             // console.log(wishlistIDs);
 
             const query = { _id: { $in: wishlistIDs } };
-            const result = await blogCollection.find(query).sort({ blog_title: 1 }).toArray();
+            const result = await blogCollection.find(query).project({ long_description: 0 }).sort({ blog_title: 1 }).toArray();
 
             res.send(result);
         })
