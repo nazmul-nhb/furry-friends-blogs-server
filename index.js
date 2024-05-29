@@ -95,7 +95,7 @@ const run = async () => {
         });
 
         // add blog
-        app.post('/blogs', async (req, res) => {
+        app.post('/blogs', verifyToken, async (req, res) => {
             // console.log((req.body));
             const result = await blogCollection.insertOne(req.body);
 
@@ -190,7 +190,7 @@ const run = async () => {
                 total_characters: { $strLenCP: "$long_description" },
                 word_count: { $size: { $split: ["$long_description", " "] } }
             }
-            
+
             const newBlogs = await blogCollection
                 .aggregate([{ $project: blog }, { $sort: { word_count: -1 } }, { $limit: 10 }]).toArray();
 
@@ -200,7 +200,7 @@ const run = async () => {
         })
 
         // add comments
-        app.post('/comments', async (req, res) => {
+        app.post('/comments', verifyToken, async (req, res) => {
             // console.log((req.body));
             const result = await commentCollection.insertOne(req.body);
 
@@ -237,7 +237,7 @@ const run = async () => {
         })
 
         // add reply
-        app.post('/replies', async (req, res) => {
+        app.post('/replies', verifyToken, async (req, res) => {
             // console.log((req.body));
             const result = await replyCollection.insertOne(req.body);
 
@@ -274,7 +274,7 @@ const run = async () => {
         })
 
         // add blog id to wishlist with user email and blog id
-        app.post('/wishlist', async (req, res) => {
+        app.post('/wishlist', verifyToken, async (req, res) => {
             const { blog_id, user_email } = req.body;
 
             // Check if the blog is already in the wishlist for the user
@@ -289,17 +289,25 @@ const run = async () => {
         })
 
         // get wishlist blog ids in array filtered by user email
-        app.get('/wishlist', async (req, res) => {
+        app.get('/wishlist', verifyToken, async (req, res) => {
             // match user
-            // if (req.query?.email !== req.user.email) {
-            //     return res.status(403).send({ message: 'Forbidden Access!' })
-            // }
+            if (req.query?.email !== req.user.email) {
+                return res.status(403).send({ message: 'Forbidden Access!' })
+            }
 
             const filter = { user_email: req.query.email };
             // console.log(filter);
             const result = await wishlistCollection.find(filter).toArray();
 
             res.send(result);
+        })
+
+        // get wishlist blog count (for navbar) filtered by user email
+        app.get('/wishlist-count', async (req, res) => {
+            const filter = { user_email: req.query.email };
+            const wishlistCount = await wishlistCollection.countDocuments(filter);
+
+            res.send({ wishlistCount });
         })
 
         // delete blog id from wishlist filtered by user email
