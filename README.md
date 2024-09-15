@@ -3,7 +3,6 @@
 ### Live Website Link
 
 - [Live Website Link (Vercel)](https://furry-friends-blogs-nhb.vercel.app)
-- [Live Website Link (Firebase)](https://furry-friends-dcbd4.web.app)
 
 ### Technologies Used in this Project
 
