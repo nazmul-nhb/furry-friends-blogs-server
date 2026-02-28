@@ -10,6 +10,7 @@ dotenv.config();
 const corsOptions = [
     'http://localhost:5173',
     'http://localhost:5174',
+    'http://localhost:3000/',
     'https://nazmul-nhb.dev',
     'https://www.nazmul-nhb.dev',
     'https://next.nazmul-nhb.dev',
