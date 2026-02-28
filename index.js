@@ -10,6 +10,10 @@ dotenv.config();
 const corsOptions = [
     'http://localhost:5173',
     'http://localhost:5174',
+    'https://nazmul-nhb.dev',
+    'https://www.nazmul-nhb.dev',
+    'https://next.nazmul-nhb.dev',
+    'https://next-nhb.vercel.app',
     'https://furry-friends-dcbd4.web.app',
     'https://furry-friends-dcbd4.firebaseapp.com',
     'https://furry-friends-blogs-nhb.vercel.app',
